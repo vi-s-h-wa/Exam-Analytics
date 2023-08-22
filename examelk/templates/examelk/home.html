@@ -1,0 +1,240 @@
+        {% extends 'examelk/base.html' %}
+
+        {% block content %}
+        <style>
+            th{
+                color: rgb(32, 32, 32);
+                font-size: 1rem;
+                text-transform: uppercase;
+            }
+            th, td {
+            border: .5px solid rgb(150, 150, 150);
+            padding: 0.6rem 5rem;
+            text-align: center;
+            }
+            .table{
+                justify-content: center;
+                align-items: center;
+            }
+            /* Main Div CSS */
+            #main{
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;          
+            }
+            .main-table{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            
+            /* List ul CSS */
+            #sub ul{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            /* List CSS */
+            #sub ul li{
+                font-size: 1.2rem;
+                list-style: none;
+                padding: 3rem 3rem;      
+            }
+
+            /* List Anchor CSS */
+            #sub ul li .list{
+                text-transform: uppercase;
+                color: rgb(66, 66, 66);
+                text-decoration: none;
+            }
+            
+
+            /* List anchor hover animation CSS */
+            #main #sub ul li a:focus{
+            border-bottom: 1px solid black;
+            }
+            .hover-underline-animation {
+                display: inline-block;
+                position: relative;
+                color: #0087ca;
+            }
+
+            .hover-underline-animation::after {
+                content: '';
+                position: absolute;
+                width: 100%;
+                transform: scaleX(0);
+                height: 1.5px;
+                bottom: 0;
+                left: 0;
+                background-color: #1d1d1d;
+                transform-origin: bottom right;
+                transition: transform 0.25s ease-out;
+            }
+
+            .hover-underline-animation:hover::after {
+                transform: scaleX(1);
+                transform-origin: bottom left;
+            }
+            .line{
+                border-bottom: 1px solid black;
+            }
+
+            .hz{
+                width:100%;
+                background-color:rgb(174, 174, 174);
+                height:3px;
+            }
+            .mandatory {
+                color: red;
+                margin-left: 5px;
+            }
+            #home {
+                display: none;
+            }
+        </style>
+        <div id="main">
+            <div id="sub">
+                <ul>
+                    <li onclick="displayl()"><a id="line" class="list hover-underline-animation line" href="#">List User</a></li>
+                    <li onclick="displayc()"><a class="list hover-underline-animation" href="#">Create New User</a></li>
+                </ul>
+            </div>
+            <div class="main-table">
+                <div class="table">
+                    <table>
+                        <tr>
+                            <th>Username</th>
+                            <th>Examcode</th>
+                        </tr>
+                        {% for item in config_data %}
+                            <tr>
+                                <td>{{ item.username }}</td>
+                                <td>{{ item.examcode }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    </div>
+            </div>
+            
+        <br>
+        <script>
+            function validateForm() {
+                var password = document.getElementById("password").value;
+                var confirm_password = document.getElementById("cpassword").value;
+                if (password != confirm_password) {
+                    alert('PASSWORD DOES NOT MATCH');
+                    return false;
+                }
+                return true;
+            }
+        
+        </script>
+        <div class="form" style="display: none;">
+            <form class="row g-3" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
+                {% csrf_token %}
+                <h3>Elastic Details</h3>
+                <div class="col-md-6">
+                    <label for="ip" class="form-label">Elastic Host<span class="mandatory">*</span></label>
+                    <input type="text" class="form-control" id="ip" name="ip" placeholder="10.184.61.166" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="port" class="form-label">Elastic Port<span class="mandatory">*</span></label>
+                    <input type="text" class="form-control" id="port" name="port" placeholder="5432" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="euser" class="form-label">Elastic Username<span class="mandatory">*</span></label>
+                    <input type="text" class="form-control" id="euser" name="euser" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="epassword" class="form-label">Elastic Password<span class="mandatory">*</span></label>
+                    <input type="text" class="form-control" id="epassword" name="epassword" placeholder="5432" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="file1" class="form-label">Upload Certificate<span class="mandatory">*</span></label>
+                    <input type="file" id="file1" name="file1" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="file2" class="form-label">ca_certificate<span class="mandatory">*</span></label>
+                    <input type="file" id="file2" name="file2" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="file3" class="form-label">client_Certificate<span class="mandatory">*</span></label>
+                    <input type="file" id="file3" name="file3" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="file4" class="form-label">client_key<span class="mandatory">*</span></label>
+                    <input type="file" id="file4" name="file4" required>
+                </div>
+                <div class="hz"></div>
+                <h3>MongoDB Details</h3>
+                <div class="col-md-6">
+                    <label for="mip" class="form-label">MongoDB IP<span class="mandatory">*</span></label>
+                    <input type="text" class="form-control" id="mip" name="mip" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="mport" class="form-label">MongoDB Port<span class="mandatory">*</span></label>
+                    <input type="text" class="form-control" id="mport" name="mport" placeholder="5432" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="muname" class="form-label">MongoDB Username<span class="mandatory">*</span></label>
+                    <input type="text" class="form-control" id="muname" name="muname" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="mpwd" class="form-label">MongoDB Password<span class="mandatory">*</span></label>
+                    <input type="text" class="form-control" id="mpwd" name="mpwd" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="dbname" class="form-label">MongoDB DB Name<span class="mandatory">*</span></label>
+                    <input type="text" class="form-control" id="dbname" name="dbname" required>
+                </div>
+                <div class="hz"></div>
+                <h3>User Details</h3>
+                <div class="col-md-6">
+                    <label for="Username" class="form-label">Username<span class="mandatory">*</span></label>
+                    <input type="text" class="form-control" id="Username" name="Username" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="ecode" class="form-label">Exam Code<span class="mandatory">*</span></label>
+                    <input type="text" class="form-control" id="ecode" name="ecode" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="password" class="form-label">Password<span class="mandatory">*</span></label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="cpassword" class="form-label">Confirm Password<span class="mandatory">*</span></label>
+                    <input type="password" class="form-control" id="cpassword" name="cpassword" required>
+                </div>
+
+                <div class="col-12 text-center">
+                    <button type="submit" class="btn btn-primary">Next</button>
+                </div>
+            </form>
+        </div>
+    </div>
+        <script>
+            function displayc(){
+                var line = document.getElementById('line');
+                line.classList.remove("line");
+                
+                
+                var form = document.querySelector('.form');
+                var table = document.querySelector('.table');
+                form.style.display = 'block';
+                table.style.display = 'none';
+            }
+            function displayl(){
+
+                var line = document.getElementById('line');
+                line.classList.remove("line");
+
+                var form = document.querySelector('.form');
+                var table = document.querySelector('.table');
+                form.style.display = 'none';
+                table.style.display = 'block';
+            }
+        </script>
+
+        {% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'examelk/base.html' %}
+
+{% block content %}
+<style>
+    #logout {
+            display: none;
+        }
+    #home {
+        display: none;
+    }
+</style>
+<form class="row g-3" method="POST">
+    {% csrf_token %}
+    <div class="col-md-6">
+        <label for="un" class="form-label">Username:</label>
+        <input type="text" class="form-control" id="un" name="un" required>
+    </div>
+    <div class="col-md-6">
+    <label for="pass" class="form-label">Password:</label>
+    <input type="password" class="form-control" id="pass" name="pass" required>
+    </div>
+    <h6>{{msg}}</h6>
+    <div class="col-12 text-center">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+</form>
+
+{% endblock %}

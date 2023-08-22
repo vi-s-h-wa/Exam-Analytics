@@ -1,0 +1,35 @@
+{% extends 'examelk/base.html' %}
+
+{% block content %}
+<style>
+    .hz{
+            width:100%;
+            background-color:rgb(174, 174, 174);
+            height:3px;
+        }
+</style>
+    <br>
+    <form method="POST" id="myForm" class="row g-3">
+    {% csrf_token %}
+    <div class="row g-3">
+    <h3 >Elastic Details</h3>
+    <p class="col-md-6"><b>Elastic Host:</b> <input type="text" name="ipaddress" value="{{ ipaddress }}"></p>
+    <p class="col-md-6"><b>Elastic Port:</b> <input type="text" name="port" value="{{ port }}"></p>
+    <p class="col-md-6"><b>Elastic Username:</b> <input type="text" name="eusername" value="{{ eusername }}"></p>
+    <p class="col-md-6"><b>Elastic password:</b> <input type="text" name="epassword" value="{{ epassword }}"></p>
+    <div class="hz"></div>
+    <h3 >Mongo Details</h3>
+    <p class="col-md-6"><b>MongoDB IP:</b> <input type="text" name="host" value="{{ host }}"></p>
+    <p class="col-md-6"><b>MongoDB Port:</b> <input type="text" name="mport" value="{{ mport }}"></p>
+    <p class="col-md-6"><b>Mongo Username:</b> <input type="text" name="musername" value="{{ musername }}"></p>
+    <p class="col-md-6"><b>Mongo Password:</b> <input type="text" name="mpassword" value="{{ mpassword }}"></p>
+    <p class="col-md-6"><b>Mongo DBName:</b> <input type="text" name="mdbname" value="{{ mdbname }}"></p>
+    <p class="col-md-6" ><b>Exam Code:</b> <input type="text" name="examcode" value="{{ examcode }}"></p>
+    </div>
+    <div class="col-12 text-center">
+    <button type="submit" class="btn btn-primary">Save</button>
+    </div>
+    </form>
+</body>
+
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'examelk/base.html' %}
+
+{% block content %}
+<style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid black;
+      padding: 8px;
+      text-align: left;
+    }
+  </style>
+<body>
+  <h1>Error Log</h1><br>
+  <label for="index" class="form-label">Filter by slot </label>
+  <select name="slot" id="slot" style="width: 40px;display: inline-block;">
+          <option value="All">All</option>     
+      {% for x in d %}
+          <option value="{{ x }}">{{ x }}</option> 
+      {% endfor %}
+  </select>
+  {% if data %}
+  <table>
+      <tr>
+          <th>Slot</th>
+          <th>Script</th>
+          <th>Error_time</th>
+          <th>Error_message</th>
+      </tr>
+      {% for item in data %}
+          <tr>
+              <td>{{ item.slot }}</td>
+              <td>{{ item.script_name }}</td>
+              <td>{{ item.error_time }}</td>
+              <td>{{ item.error_message }}</td>
+          </tr>
+      {% endfor %}
+  </table>
+  {% else %}
+  <p>No logs present!!</p>
+  {% endif %}
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+      $(document).ready(function() {
+          $("#slot").change(function() {
+              var selectedSlot = $(this).val();
+              if (selectedSlot === "All") {
+                  $("table tr").show();
+              } else {
+                  $("table tr").hide();
+                  $("table tr:has(td:first-child:contains('" + selectedSlot + "'))").show();
+              }
+          });
+      });
+  </script>
+</body>
+
+{% endblock %}

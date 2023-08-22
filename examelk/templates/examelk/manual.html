@@ -1,0 +1,185 @@
+{% extends 'examelk/base.html' %}
+
+{% block content %}
+<style>
+    .load {
+        border: none;
+        color: #0d6efd;
+        font-size: 160px;
+        position: fixed;
+        display: none;
+        top: 50%;
+        left: 50%;
+        z-index: 9999;
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+    .nav-link {
+            display: block;
+        }
+    .mandatory {
+            color: red;
+            margin-left: 5px;
+        }
+</style>
+<h2 id="top">Exam Script</h2>
+<div id="load" class="load">
+    <i class="fa fa-spinner fa-spin"></i>
+</div>
+<br>
+<div class="col-md-6">
+    <h4>Exam type: {{ ecode }}</h4>
+</div>
+<form id="myForm" class="row g-3" method="POST" onsubmit="loader()">
+    {% csrf_token %}
+    <br>
+    <div class="col-md-6">
+        <label for="papercode" class="form-label">Papercode<span class="mandatory">*</span></label>
+        <input type="text" class="form-control" id="papercode" name="papercode" required>
+    </div>
+    <div class="col-md-6">
+        <label for="index" class="form-label">Elastic Index<span class="mandatory">*</span></label>
+        <input type="text" class="form-control" id="index" name="index" required>
+    </div>
+    <div class="col-md-6">
+        <label for="index" class="form-label">Ans Index<span class="mandatory">*</span></label>
+        <input type="text" class="form-control" id="ansindex" name="ansindex" required>
+    </div>
+    <div class="col-md-6">
+        <label for="index" class="form-label">Mal Index<span class="mandatory">*</span></label>
+        <input type="text" class="form-control" id="malindex" name="malindex" required>
+    </div>
+    <div class="col-md-6">
+        <label for="estime" class="form-label">Exam Start Time (Z/EST timestamp)<span class="mandatory">*</span></label>
+        <input type="datetime-local" step="1" class="form-control" id="estime" name="estime" required>
+    </div>
+    <div class="col-md-6">
+        <label for="eetime" class="form-label">Exam End Time (Z/EST timestamp)<span class="mandatory">*</span></label>
+        <input type="datetime-local" step="1" class="form-control" id="eetime" name="eetime" required>
+    </div>
+    <div class="col-md-6">
+        <label for="qstime" class="form-label">Day Start Time<span class="mandatory">*</span></label>
+        <input type="datetime-local" step="1" class="form-control" id="qstime" name="qstime" required>
+    </div>
+    <div class="col-md-6">
+        <label for="qetime" class="form-label">Day End Time<span class="mandatory">*</span></label>
+        <input type="datetime-local" step="1" class="form-control" id="qetime" name="qetime" required>
+    </div>
+    <div class="col-md-6">
+        {% if data%}
+        <label for="index" class="form-label">Slot<span class="mandatory">*</span></label>
+        <select class="form-control" name="slot" id="slot">
+            {% for x in  data %}
+              <option value="{{ x.exam_slot_code }}">{{ x.exam_slot_code }}</option>    
+            {% endfor %}
+        </select>
+        {% elif data1 %}
+        <label for="index" class="form-label">Slot<span class="mandatory">*</span></label>
+        <select class="form-control" name="slot" id="slot">
+            {% for x in  data1 %}
+              <option value="{{x.slot}}">{{ x.slot }}</option>    
+            {% endfor %}
+        </select>
+        {% else%}
+        No slot found click here to create slots:<a class="btn btn-primary" onclick="create()">create</a>
+        <div class="col-md-6" id="loads" style="display: none;">
+            <input type="text" class="form-control" id="slots" name="slots" placeholder="if multiple slot exist ',' slot1, slot2, ..." required>
+            <a class="btn btn-primary" onclick="createslot(),hide()">Create slot</a>
+        </div>
+        {% endif %}
+    </div>
+    <div class="col-md-6">
+        <label for="scripttorun" class="form-label">Script to run<span class="mandatory">*</span></label>
+        <select class="form-select" name="scripttorun"  multiple="multiple">
+            <option value="canomaly">Canomaly</option>
+            <option value="CSMG">CSMG</option>
+            <option value="mac">MAC</option>
+            <option value="mal">MAL</option>
+            <option value="xor">XOR</option>
+            <option value="xornan">XORNAN</option>
+            <option value="xor_kvm">XOR_KVM</option>
+            <option value="quickfinish">Quick Finish</option>
+            <option value="centerdelay">Center Delay</option>
+            <option value="slowstart">Slow Start</option>
+        </select>
+    </div>
+    <div class="col-12 text-center">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+</form>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function create() {
+            var l = document.querySelector('#loads');
+            l.style.display = 'block';
+        }
+    function hide(){
+            var l = document.querySelector('#loads');
+            l.style.display = 'none';
+    }
+    function loader() {
+        var l = document.querySelector('.load');
+        var b = document.querySelector('.body');
+        b.style.filter = 'blur(5px)'
+        b.style.pointerEvents = 'none';
+        l.style.display = 'block';
+    }
+    function createslot() {
+
+        var slots = document.getElementById("slots").value;
+        // AJAX call to the server
+        $.ajax({
+            type: 'POST',
+            url: '/create-slot/',
+            data: {
+                'slots': slots,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                alert('Slot created successfully! Please reload the page.');
+            },
+            error: function(xhr, status, error) {
+                // Handle errors
+                console.log(error);
+            }
+        });
+        }
+
+    $(document).ready(function() {
+        $('#myForm').submit(function(e) {
+            e.preventDefault(); // Prevent default form submission
+
+            // Serialize the form data
+            var formData = $(this).serialize();
+
+            // Send an AJAX request
+            $.ajax({
+                url: $(this).attr('action'),
+                type: $(this).attr('method'),
+                data: formData,
+                beforeSend: function() {
+                    loader(); // Show loader before sending the request
+                },
+                success: function(response) {
+                    // Handle the response
+                    console.log('Form submitted successfully!');
+                    // You can update specific parts of the page with the response data
+                },
+                error: function(xhr, status, error) {
+                    // Handle any errors that occur during the AJAX request
+                    console.error('An error occurred while submitting the form:', error);
+                },
+                complete: function() {
+                    // Hide loader after request completion
+                    var l = document.querySelector('.load');
+                    var b = document.querySelector('.body');
+                    b.style.filter = 'none';
+                    b.style.pointerEvents = 'auto';
+                    l.style.display = 'none';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

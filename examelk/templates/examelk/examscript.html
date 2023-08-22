@@ -1,0 +1,176 @@
+{% extends 'examelk/base.html' %}
+
+{% block content %}
+<style>
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid black;
+      padding: 8px;
+      text-align: left;
+    }
+    .mandatory {
+                color: red;
+                margin-left: 5px;
+            }
+</style>
+<h2 id="top">Exam Script</h2>
+<br>
+<div class="col-md-6">
+    <h4>Exam type: {{ ecode }}</h4>
+</div>
+<form id="myForm" class="row g-3" method="POST" data-username = "{{un}}">
+    {% csrf_token %}
+    <br>
+    <div class="col-md-6">
+        <label for="papercode" class="form-label">Papercode<span class="mandatory">*</span></label>
+        <input type="text" class="form-control" id="papercode" name="papercode" required>
+    </div>
+    <div class="col-md-6">
+        <label for="index" class="form-label">Elastic Index<span class="mandatory">*</span></label>
+        <input type="text" class="form-control" id="index" name="index" required>
+    </div>
+    <div class="col-md-6">
+        <label for="index" class="form-label">Ans Index<span class="mandatory">*</span></label>
+        <input type="text" class="form-control" id="ansindex" name="ansindex" required>
+    </div>
+    <div class="col-md-6">
+        <label for="index" class="form-label">Mal Index<span class="mandatory">*</span></label>
+        <input type="text" class="form-control" id="malindex" name="malindex" required>
+    </div>
+    <div class="col-md-6">
+        <label for="estime" class="form-label">Exam Start Time (Z/EST timestamp)<span class="mandatory">*</span></label>
+        <input type="datetime-local" step="1" class="form-control" id="estime" name="estime" required>
+    </div>
+    <div class="col-md-6">
+        <label for="eetime" class="form-label">Exam End Time (Z/EST timestamp)<span class="mandatory">*</span></label>
+        <input type="datetime-local" step="1" class="form-control" id="eetime" name="eetime" required>
+    </div>
+    <div class="col-md-6">
+        <label for="qstime" class="form-label">Day Start Time<span class="mandatory">*</span></label>
+        <input type="datetime-local" step="1" class="form-control" id="qstime" name="qstime" required>
+    </div>
+    <div class="col-md-6">
+        <label for="qetime" class="form-label">Day End Time<span class="mandatory">*</span></label>
+        <input type="datetime-local" step="1" class="form-control" id="qetime" name="qetime" required>
+    </div>
+    <div class="col-md-6">
+        {% if data%}
+        <label for="index" class="form-label">Slot<span class="mandatory">*</span></label>
+        <select class="form-control" name="slot" id="slot">
+            {% for x in  data %}
+              <option value="{{ x.exam_slot_code }}">{{ x.exam_slot_code }}</option>    
+            {% endfor %}
+        </select>
+        {% elif data1 %}
+        <label for="index" class="form-label">Slot<span class="mandatory">*</span></label>
+        <select class="form-control" name="slot" id="slot">
+            {% for x in  data1 %}
+              <option value="{{ x.slot }}">{{ x.slot }}</option>    
+            {% endfor %}
+        </select>
+        {% else%}
+        No slot found click here to create slots:<a class="btn btn-primary" onclick="create()">create</a>
+        <div class="col-md-6" id="loads" style="display: none;">
+            <input type="text" class="form-control" id="slots" name="slots" placeholder="if multiple slot exist ',' slot1, slot2, ..." required>
+            <a class="btn btn-primary" onclick="createslot(),hide()">Create slot</a>
+        </div>
+        {% endif %}
+    </div>
+    <div class="col-md-6">
+        <label for="interval" class="form-label">Time Interval to run analytics<span class="mandatory">*</span></label>
+        <input type="number" class="form-control" id="interval" name="interval" required>
+    </div>
+    <div class="col-12 text-center">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+    <div class="col-12 text-center">
+        <h5>Scripts run by the user</h5>
+        {% if script %}
+            <table>
+                <tr>
+                    <th>Index</th>
+                    <th>Start time</th>
+                    <th>End time</th>
+                    <th>Slot</th>
+                </tr>
+                {% for item in script %}
+                    <tr>
+                        <td>{{ item.index }}</td>
+                        <td>{{ item.starttime }}</td>
+                        <td>{{ item.endtime }}</td>
+                        <td>{{ item.slot }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+        <p>No activity done</p>
+        {% endif %}
+    </div>
+</form>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function create() {
+            var l = document.querySelector('#loads');
+            l.style.display = 'block';
+        }
+    function hide(){
+            var l = document.querySelector('#loads');
+            l.style.display = 'none';
+    }
+    function createslot() {
+
+        var slots = document.getElementById("slots").value;
+        // AJAX call to the server
+        $.ajax({
+            type: 'POST',
+            url: '/create-slot/',
+            data: {
+                'slots': slots,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                alert('Slot created successfully! Please reload the page.');
+            },
+            error: function(xhr, status, error) {
+                // Handle errors
+                console.log(error);
+            }
+        });
+        }
+    function handleSubmit(event) {
+        event.preventDefault(); // Prevent default form submission behavior
+
+        // Get the form element and retrieve the username from the data attribute
+        var form = $('#myForm');
+        var username = form.data('username');
+
+        // Serialize the form data and append the username to it
+        var formData = form.serializeArray();
+        formData.push({ name: 'un', value: username });
+
+        // AJAX call to submit form data to the server
+        $.ajax({
+            type: 'POST',
+            url: '/examscript/', // Replace with the URL to handle form submission
+            data: formData,
+            success: function(response) {
+                alert('Form submitted successfully!'); // Display success message or handle the response as needed
+            },
+            error: function(xhr, status, error) {
+                console.log(error); // Handle errors
+            }
+        });
+    }
+
+// Attach event listener to the form submit button
+    $(document).ready(function() {
+        $('#myForm').on('submit', handleSubmit);
+    });
+</script>
+
+
+
+{% endblock %}

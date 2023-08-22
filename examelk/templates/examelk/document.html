@@ -1,0 +1,152 @@
+{% extends 'examelk/base.html' %}
+
+{% block content %}
+    <style>
+        #home{
+            display: none;
+        }
+        br{
+            height:10px;
+        }
+        b{
+            line-height: .5;
+            font-size: 1.3rem;
+            padding-top:2rem;
+            text-transform: capitalize;
+        }
+        /* Main Section */
+        .main{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        h1{
+            text-align: center;
+        }
+        /* First div */
+        .container{
+            padding: 0px;
+            
+        }
+        .first{
+            width: 300px;
+        }
+        .col-md-4, .col-md-5{
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            flex-direction: column;
+        }
+        .btn{
+            text-transform: capitalize;
+            width: 11rem;
+            margin:0rem 0rem;
+            
+        }
+        /*Vert line */
+        .vl{
+            height:30rem;
+            background-color:rgb(174, 174, 174);
+            width:1px;
+            margin-right: 4.6rem;
+        }
+    </style>
+    <br>
+    <br>
+    <section class="main">
+        <div class="col-md-4 first">
+            <b>Script Execution mode</b> <div style="margin: 10px 0 10px 0;"></div>
+            <a href="/examscript/?ecode={{ examcode }}&un={{un}}" class="btn btn-primary">Auto</a> <div style="margin: 10px 0 10px 0;"></div>
+            <a href="/manual/?ecode={{ examcode }}&un={{un}}" class="btn btn-primary">Manual</a>
+            <div style="margin: 10px 0 10px 0;"></div><div style="margin: 10px 0 10px 0;"></div>
+            <b>Other Options</b> <br>
+            {% if collection_exists %}
+            <div>
+                <p>If KVM collections not found <a href="#" onclick="kvm()">click here</a></p> 
+                <!-- <button class="btn btn-primary" >create</button> -->
+            </div> <div style="margin: 10px 0 10px 0;"></div>
+            {% endif %}
+            
+            <a href="/errors/?username={{un}}" class="btn btn-primary">Exam Analytical Status</a>
+            <div style="margin: 10px 0 10px 0;"></div>
+            <a class="btn btn-primary" onclick="Delete()">Delete Collections</a>
+            <div class="col-md-6" id="load" style="display: none;">
+                <label for="collections" class="form-label">Enter collections to be deleted:</label>
+                <input type="text" class="form-control" id="collections" name="collections" placeholder="if multiple collections exist ',' col1, col2, ..." required>
+                <button class="btn btn-primary" onclick="deleteCollections(),hide()">Delete Collections</button>
+            </div>
+        </div>
+
+        <div class="vl"></div>
+
+        <div class="row g-3" style="text-align: center;">
+            <p class="col-md-4"><b>Exam Code</b> <br> {{ examcode }}</p>
+            <p class="col-md-4"><b>Host</b> <br> {{ ipaddress }}</p>
+            <p class="col-md-4"><b>Port</b> <br> {{ port }}</p>
+            <p class="col-md-4"><b>Elastic username</b> <br> {{ eusername }}</p>
+            <p class="col-md-4"><b>Elastic password</b> <br> {{ epassword }}</p>
+            <p class="col-md-4"><b>Mongo ip</b> <br> {{ host }}</p>
+            <p class="col-md-4"><b>Mongo port</b> <br> {{ mport }}</p>
+            <p class="col-md-4"><b>Mongo username</b> <br> {{ musername }}</p>
+            <p class="col-md-4"><b>Mongo password</b> <br> {{ mpassword }}</p>
+            <p class="col-md-4"><b>Name</b> <br> {{ mdbname }}</p>
+        </div>
+        
+    </section>
+    <a href="/edit/?username={{un}}" class="btn btn-primary" style="margin-left: 42.5rem;">Edit</a>
+    
+    <div style="margin: 10px 0 10px 0;"></div><div style="margin: 10px 0 10px 0;"></div>
+    <div class="row g-3"></div>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        function hide(){
+            var l = document.querySelector('#load');
+            l.style.display = 'none';
+        }
+        function Delete() {
+            var l = document.querySelector('#load');
+            l.style.display = 'block';
+        }
+        function deleteCollections() {
+
+            var collections = document.getElementById("collections").value;
+            // AJAX call to the server
+            $.ajax({
+                type: 'POST',
+                url: '/delete-collections/',
+                data: {
+                    'collections': collections,
+                    'dbname': '{{ mdbname }}' ,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    // Handle the response from the server
+                    alert('Collections deleted successfully!');
+                },
+                error: function(xhr, status, error) {
+                    // Handle errors
+                    console.log(error);
+                }
+            });
+        }
+        function kvm() {
+
+            // AJAX call to the server
+            $.ajax({
+                type: 'POST',
+                url: '/kvm/',
+                data: {
+                    'host' : '{{ host }}',
+                    'port' : '{{ mport }}',
+                    'dbname': '{{ mdbname }}' ,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                error: function(xhr, status, error) {
+                    // Handle errors
+                    console.log(error);
+                }
+            });
+        }
+    </script>
+{% endblock %}
